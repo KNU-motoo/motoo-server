@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot-apps'
+    static_configs:
+      - targets:
+          - '${TRADING_API_HOST}:${TRADING_API_SERVER_PORT}'
+          - '${BOT_ENGINE_HOST}:${BOT_ENGINE_SERVER_PORT}'
+          - '${MARKET_SIMULATOR_HOST}:${MARKET_SIMULATOR_SERVER_PORT}'
+
+  - job_name: 'mysql'
+    static_configs:
+      - targets:
+          - '${MYSQL_EXPORTER_HOST}:${MYSQL_EXPORTER_PORT}'

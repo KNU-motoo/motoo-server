@@ -4,3 +4,13 @@ spring:
 
   application:
     name: market-simulator
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true

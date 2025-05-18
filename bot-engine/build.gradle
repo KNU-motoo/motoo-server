@@ -8,6 +8,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'io.projectreactor:reactor-test'
 
+    // Prometheus 모니터링 추가
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+
     implementation project(':common-core')
     implementation project(':common-db')
 }

@@ -2,37 +2,43 @@
 
 services:
   trading-api:
-    image: wodydl/motoo-trading-api
+    image: wodydl0/motoo-trading-api
     env_file:
-      - ${ENV_FILE}
+      - .env.prod
     ports:
       - "${TRADING_API_SERVER_PORT}:${TRADING_API_SERVER_PORT}"
     depends_on:
       - db
       - redis
+    networks:
+      - motoo-network
 
   market-simulator:
-    image: wodydl/motoo-market-simulator
+    image: wodydl0/motoo-market-simulator
     env_file:
-      - ${ENV_FILE}
+      - .env.prod
     ports:
       - "${MARKET_SIMULATOR_SERVER_PORT}:${MARKET_SIMULATOR_SERVER_PORT}"
     depends_on:
       - db
       - redis
+    networks:
+      - motoo-network
 
   bot-engine:
-    image: wodydl/motoo-bot-engine
+    image: wodydl0/motoo-bot-engine
     env_file:
-      - ${ENV_FILE}
+      - .env.prod
     ports:
       - "${BOT_ENGINE_SERVER_PORT}:${BOT_ENGINE_SERVER_PORT}"
     depends_on:
       - db
       - redis
+    networks:
+      - motoo-network
 
   db:
-    image: mysql:8
+    image: mysql:8.4.5
     container_name: motoo-db
     environment:
       MYSQL_DATABASE: motoo
@@ -41,29 +47,59 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - motoo-network
 
   redis:
-    image: redis:7
+    image: redis:7.0
     container_name: motoo-redis
     command: --requirepass ${REDIS_PASSWORD}
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - motoo-network
 
   prometheus:
     image: prom/prometheus:latest
+    env_file:
+      - .env.prod
     container_name: motoo-prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - motoo-network
 
   grafana:
     image: grafana/grafana:latest
+    env_file:
+      - .env.prod
     container_name: motoo-grafana
     volumes:
       - grafana-storage:/var/lib/grafana
     ports:
       - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+    networks:
+      - motoo-network
+
+  mysql-exporter:
+    image: prom/mysqld-exporter
+    env_file:
+      - .env.prod
+    container_name: motoo-mysql-exporter
+    volumes:
+      - ./monitoring/.my.cnf:/etc/mysql/.my.cnf:ro
+    command:
+      - '--config.my-cnf=/etc/mysql/.my.cnf'
+    ports:
+      - "${MYSQL_EXPORTER_PORT}:${MYSQL_EXPORTER_PORT}"
+    networks:
+      - motoo-network
 
 volumes:
   grafana-storage:
+
+networks:
+  motoo-network:
+    driver: bridge

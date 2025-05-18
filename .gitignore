@@ -38,3 +38,6 @@ out/
 
 .env
 .env.prod
+/monitoring/prometheus.yml
+/monitoring/prometheus.prod.yml
+/monitoring/.my.cnf
