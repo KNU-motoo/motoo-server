@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5' apply false // 각각 하위 모듈에서만 사용
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'knu.wodydl'
+    version = '0.0.1-SNAPSHOT'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    dependencies {
+        // 공통 유틸
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // 테스트
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+//    의존성 외 설정은 별도 블록에서
+//    tasks.named('test') {
+//        useJUnitPlatform()
+//    }
+
+    tasks.withType(Test).configureEach {
+        enabled = false
+    }
+
+    // 공통 모듈에서는 bootJar 끄기
+    if (project.name == 'common-core' || project.name == 'common-db') {
+        tasks.named('bootJar') {
+            enabled = false
+        }
+        tasks.named('jar') {
+            enabled = true
+        }
+    }
+}
+
+tasks.named('jar') {
+    enabled = true
+}

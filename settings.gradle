@@ -1,0 +1,7 @@
+rootProject.name = 'motoo'
+
+include ':bot-engine'
+include ':trading-api'
+include ':market-simulator'
+include ':common-core'
+include ':common-db'
