@@ -1,0 +1,53 @@
+name: CD - Production Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to Prod Server
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: ✅ Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: 🔑 Connect & Deploy to Home Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+
+          script: |
+            echo "🔍 Moving to project directory"
+            cd ~/motoo
+
+            echo "📝 Writing .env.prod"
+            echo "${{ secrets.ENV_FILE }}" > .env.prod
+
+            echo "📁 Ensuring monitoring config exists"
+            if [ ! -f monitoring/prometheus.yml ]; then
+              echo "⚠️ prometheus.yml not found! Deployment aborted."
+              exit 1
+            fi
+
+            if [ ! -f monitoring/.my.cnf ]; then
+              echo "⚠️ .my.cnf not found! Deployment aborted."
+              exit 1
+            fi
+
+            echo "📦 Pulling latest Docker images"
+            docker pull wodydl0/motoo-trading-api
+            docker pull wodydl0/motoo-market-simulator
+            docker pull wodydl0/motoo-bot-engine
+
+            echo "🧹 Stopping existing containers"
+            docker compose -f docker-compose.prod.yml down
+
+            echo "🚀 Starting updated containers"
+            docker compose -f docker-compose.prod.yml up -d
+
+            echo "✅ Deployment complete"
