@@ -10,8 +10,10 @@ services:
     ports:
       - "${TRADING_API_SERVER_PORT}:${TRADING_API_SERVER_PORT}"
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - motoo-network
 
@@ -24,7 +26,10 @@ services:
     ports:
       - "${MARKET_SIMULATOR_SERVER_PORT}:${MARKET_SIMULATOR_SERVER_PORT}"
     depends_on:
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - motoo-network
 
@@ -37,13 +42,18 @@ services:
     ports:
       - "${BOT_ENGINE_SERVER_PORT}:${BOT_ENGINE_SERVER_PORT}"
     depends_on:
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - motoo-network
 
   db:
     image: mysql:8.4.5
     container_name: motoo-local-db
+    command:
+      - "--bind-address=0.0.0.0"
     environment:
       MYSQL_DATABASE: motoo
       MYSQL_USER: ${DB_USERNAME}
@@ -53,6 +63,11 @@ services:
       - "${DB_PORT}:${DB_PORT}"
     networks:
       - motoo-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
     image: redis:7
@@ -90,6 +105,8 @@ services:
   mysql-exporter:
     image: prom/mysqld-exporter
     container_name: motoo-mysql-exporter
+    depends_on:
+      - db
     volumes:
       - ./monitoring/.my.cnf:/etc/mysql/.my.cnf:ro
     command:
