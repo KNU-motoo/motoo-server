@@ -2,10 +2,10 @@ server:
   port: ${MARKET_SIMULATOR_SERVER_PORT:8081}
 
 spring:
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+#  datasource:
+#    url: ${DB_URL}
+#    username: ${DB_USERNAME}
+#    password: ${DB_PASSWORD}
 
   data:
     redis:
@@ -13,10 +13,10 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:password}
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    open-in-view: false
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    open-in-view: false
 
 logging:
   level:

@@ -13,5 +13,5 @@ dependencies {
 
 
     implementation project(':common-core')
-    implementation project(':common-db')
+    //implementation project(':common-db')
 }
