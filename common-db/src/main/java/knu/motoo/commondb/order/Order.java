@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "orders") // 'order'는 SQL 예약어이므로 'orders'로 변경
 public class Order extends BaseTimeEntity {
 
     @Id @Column(name = "order_id")
