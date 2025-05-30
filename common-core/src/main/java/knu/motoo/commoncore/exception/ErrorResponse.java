@@ -1,5 +1,8 @@
 package knu.motoo.commoncore.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorResponse{
     private final String code;
     private final String message;
@@ -9,11 +12,4 @@ public class ErrorResponse{
         this.message = message;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }
