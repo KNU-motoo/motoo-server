@@ -60,7 +60,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "3307:3306" # 개인 로컬 별 환경변수화 하기
     networks:
       - motoo-network
     healthcheck:
@@ -115,6 +115,23 @@ services:
       - "${MYSQL_EXPORTER_PORT}:${MYSQL_EXPORTER_PORT}"
     networks:
       - motoo-network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: motoo-node-exporter
+    ports:
+      - "${NODE_EXPORTER_PORT}:${NODE_EXPORTER_PORT}"
+    networks:
+      - motoo-network
+    pid: "host"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
 
 volumes:
   grafana-storage:
